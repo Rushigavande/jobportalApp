@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiter Profile - Job Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            padding-top: 76px;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            text-decoration: none;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #333 !important;
+            transition: color 0.3s;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: transform 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* Page Layout */
+        .page-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Typography */
+        .page-title {
+            color: #2d3748;
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 1.25rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Form Styles */
+        .form-control {
+            border: 1px solid #e0e0e0;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* File Upload */
+        .file-upload {
+            background: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: block;
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.8rem 2.5rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Company Section */
+        .company-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .company-section .form-control {
+            background: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-container {
+                margin: 1rem auto;
+            }
+
+            .profile-card {
+                padding: 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/dashboard/}">Job4you</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarToggler">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item" sec:authorize="hasAuthority('Recruiter')">
+                        <a class="nav-link" th:href="@{/dashboard/}">
+                            <i class="fas fa-home"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Recruiter')">
+                        <a class="nav-link" th:href="@{/add-jobs/}">
+                            <i class="fas fa-plus-circle"></i>Post Job
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Recruiter')">
+                        <a class="nav-link active" th:href="@{/recruiter-profile/}">
+                            <i class="fas fa-user-edit"></i>Edit Profile
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="user-profile">
+                    <img class="user-avatar" th:if="${profile.profilePhoto != null}" th:src="@{${profile.profilePhoto}}" alt="Profile"/>
+                    <span class="user-name" th:if="${profile.firstName != null && profile.lastName != null}" 
+                          th:text="${profile.firstName + ' ' + profile.lastName}"></span>
+                    <a href="/logout" class="btn-logout">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div class="profile-card">
+            <form th:action="@{/recruiter-profile/addNew}" 
+                  th:object="${profile}" 
+                  method="post" 
+                  enctype="multipart/form-data">
+                
+                <h1 class="page-title">Recruiter Profile</h1>
+                <p class="page-subtitle">Set up your professional profile</p>
+
+                <!-- Alert Messages -->
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${successMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${errorMessage}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="section-title">Personal Information</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input placeholder="First Name" 
+                               id="firstName" 
+                               th:field="*{firstName}" 
+                               name="firstName" 
+                               type="text" 
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid' : ''"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <input placeholder="Last Name" 
+                               id="lastName" 
+                               name="lastName" 
+                               th:field="*{lastName}" 
+                               type="text" 
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid' : ''"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="section-title">Location</div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <input placeholder="City" 
+                               name="city" 
+                               th:field="*{city}" 
+                               type="text" 
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('city')} ? 'is-invalid' : ''"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <input placeholder="State" 
+                               name="state" 
+                               type="text" 
+                               th:field="*{state}" 
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('state')} ? 'is-invalid' : ''"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('state')}" th:errors="*{state}"></div>
+                    </div>
+                    <div class="col-md-4">
+                        <input placeholder="Country" 
+                               name="country" 
+                               th:field="*{country}" 
+                               type="text" 
+                               class="form-control"
+                               th:classappend="${#fields.hasErrors('country')} ? 'is-invalid' : ''"/>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('country')}" th:errors="*{country}"></div>
+                    </div>
+                </div>
+
+                <!-- Company Information -->
+                <div class="section-title">Company Information</div>
+                <div class="company-section">
+                    <div class="row">
+                        <div class="col-12">
+                            <input placeholder="Company Name" 
+                                   id="company" 
+                                   name="company" 
+                                   th:field="*{company}" 
+                                   type="text" 
+                                   class="form-control"
+                                   th:classappend="${#fields.hasErrors('company')} ? 'is-invalid' : ''"/>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('company')}" th:errors="*{company}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Photo -->
+                <div class="section-title">Profile Photo</div>
+                <div class="file-upload">
+                    <label class="file-upload-label" for="profile-photo">
+                        <i class="fas fa-user-circle"></i>
+                        <span th:text="${profile.profilePhoto != null ? profile.profilePhoto : 'Click to upload profile photo'}">Click to upload profile photo</span>
+                        <small class="d-block text-muted">Supports: PNG, JPEG</small>
+                    </label>
+                    <input id="profile-photo" 
+                           type="file" 
+                           name="image" 
+                           accept="image/png, image/jpeg"/>
+                    <input type="text" 
+                           name="profilePhoto" 
+                           th:field="*{profilePhoto}" 
+                           hidden/>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" 
+                            id="submit2" 
+                            name="submit" 
+                            class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        // File upload preview
+        document.querySelectorAll('.file-upload').forEach(upload => {
+            const input = upload.querySelector('input[type="file"]');
+            const label = upload.querySelector('.file-upload-label span');
+            
+            if (input) {
+                input.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        label.textContent = e.target.files[0].name;
+                    }
+                });
+            }
+        });
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 5000);
+    </script>
+</body>
+</html>

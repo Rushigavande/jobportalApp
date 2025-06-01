@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Details - Job Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 76px;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+        }
+
+        .navbar-brand span {
+            color: var(--secondary-color);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #333 !important;
+            transition: color 0.3s;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+
+        .user-name {
+            color: #2d3748;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: transform 0.3s;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* Job Details Styles */
+        .job-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .back-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--secondary-color);
+        }
+
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+
+        .job-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .company-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .company-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+
+        .company-details h5 {
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .company-location {
+            color: #718096;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .job-specs {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .spec-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            transition: transform 0.3s;
+        }
+
+        .spec-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .spec-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        .spec-label {
+            color: #718096;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .spec-value {
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .job-description {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            color: #2d3748;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        .description-content {
+            color: #4a5568;
+            line-height: 1.8;
+        }
+
+        .candidates-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .candidate-link {
+            display: block;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .candidate-link:hover {
+            background: #edf2f7;
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn-apply {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 200px;
+        }
+
+        .btn-apply:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-save {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 200px;
+        }
+
+        .btn-save:hover:not(:disabled) {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #fff1f2;
+            color: #ef4444;
+            border: 2px solid #ef4444;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 200px;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .specs-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-apply, .btn-save, .btn-delete {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body th:object="${jobDetails}">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                Job4you<span>.com</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <!-- Job Seeker Navigation -->
+                    <li class="nav-item" sec:authorize="hasAuthority('Job Seeker')">
+                        <a class="nav-link" th:href="@{/dashboard/}">
+                            <i class="fas fa-search"></i>Search Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Job Seeker')">
+                        <a class="nav-link" th:href="@{/saved-jobs/}">
+                            <i class="fas fa-bookmark"></i>Saved Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Job Seeker')">
+                        <a class="nav-link" th:href="@{/job-seeker-profile/}">
+                            <i class="fas fa-user-edit"></i>Edit Profile
+                        </a>
+                    </li>
+
+                    <!-- Recruiter Navigation -->
+                    <li class="nav-item" sec:authorize="hasAuthority('Recruiter')">
+                        <a class="nav-link" th:href="@{/dashboard/add}">
+                            <i class="fas fa-plus-circle"></i>Post Job
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Recruiter')">
+                        <a class="nav-link" th:href="@{/dashboard/}">
+                            <i class="fas fa-briefcase"></i>My Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasAuthority('Recruiter')">
+                        <a class="nav-link" th:href="@{/recruiter-profile/}">
+                            <i class="fas fa-user-edit"></i>Edit Profile
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="user-profile">
+                    <img th:if="${user.photosImagePath != null}"
+                         th:src="@{${user.photosImagePath}}"
+                         alt="Profile"
+                         class="user-avatar"
+                         onerror="this.src='https://ui-avatars.com/api/?name=User&background=random'">
+                    <img th:unless="${user.photosImagePath != null}"
+                         src="https://ui-avatars.com/api/?name=User&background=random"
+                         alt="Profile"
+                         class="user-avatar">
+                    
+                    <span class="user-name" th:text="${user.firstName + ' ' + user.lastName}">
+                        John Doe
+                    </span>
+                    
+                    <a href="/logout" class="btn btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Job Header -->
+        <div class="job-header">
+            <a href="javascript:history.back()" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Back to Search Results
+            </a>
+            
+            <div class="company-info">
+                <img th:if="${jobDetails.jobCompanyId.logo != null}" 
+                     th:src="${jobDetails.jobCompanyId.logo}"
+                     alt="Company Logo" 
+                     class="company-logo">
+                <div class="company-details">
+                    <h1 class="job-title" th:text="${jobDetails.jobTitle}">Software Engineer</h1>
+                    <h5 th:text="${jobDetails.jobCompanyId.name}">Company Name</h5>
+                    <div class="company-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span th:text="${jobDetails.jobLocationId.city + ', ' + jobDetails.jobLocationId.state}">
+                            Location
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Specifications -->
+        <div class="job-specs">
+            <h2 class="section-title">Job Specifications</h2>
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-icon">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="spec-label">Date Posted</div>
+                    <div class="spec-value" th:text="${jobDetails.postedDate}">12 Nov, 2030</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="spec-label">Salary Range</div>
+                    <div class="spec-value" th:text="${jobDetails.salary}">50k - 120k/y</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="spec-label">Employment Type</div>
+                    <div class="spec-value" th:text="${jobDetails.jobType}">Full-time</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="spec-label">Work Location</div>
+                    <div class="spec-value" th:text="${jobDetails.remote}">Remote</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Description -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="job-description">
+                    <h2 class="section-title">Job Description</h2>
+                    <div class="description-content" th:utext="${jobDetails.descriptionOfJob}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidates Section (For Recruiter) -->
+            <div class="col-lg-4" sec:authorize="hasAuthority('Recruiter')">
+                <div class="candidates-section">
+                    <h2 class="section-title">Applied Candidates</h2>
+                    <div class="candidates-list">
+                        <th:block th:each="applyList : ${applyList}">
+                            <a th:href="@{/job-seeker-profile/{id}(id=${applyList.userId.userAccountId})}"
+                               class="candidate-link"
+                               th:text="${applyList.userId.firstName + ' ' + applyList.userId.lastName}">
+                                Candidate Name
+                            </a>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <!-- Job Seeker Actions -->
+            <div sec:authorize="hasAuthority('Job Seeker')" class="d-flex gap-3">
+                <form th:action="@{/job-details/apply/{id}(id=${jobDetails.jobPostId})}" 
+                      th:object="${applyJob}" 
+                      method="post">
+                    <button class="btn btn-apply" 
+                            type="submit" 
+                            th:disabled="${alreadyApplied}"
+                            th:text="${alreadyApplied ? 'Already Applied' : 'Apply Now'}">
+                        Apply Now
+                    </button>
+                </form>
+                
+                <form th:action="@{/job-details/save/{id}(id=${jobDetails.jobPostId})}" 
+                      th:object="${applyJob}"
+                      method="post">
+                    <button class="btn btn-save" 
+                            type="submit" 
+                            th:disabled="${alreadySaved}"
+                            th:text="${alreadySaved ? 'Already Saved' : 'Save Job'}">
+                        Save Job
+                    </button>
+                </form>
+            </div>
+
+            <!-- Recruiter Actions -->
+            <div sec:authorize="hasAuthority('Recruiter')" class="d-flex gap-3">
+                <a th:href="@{/dashboard/edit/{id}(id=${jobDetails.jobPostId})}" 
+                   class="btn btn-save">
+                    <i class="fas fa-edit me-2"></i>Edit Job
+                </a>
+                
+                <form th:action="@{/dashboard/deleteJob/{id}(id=${jobDetails.jobPostId})}" 
+                      method="post">
+                    <button class="btn btn-delete" type="submit">
+                        <i class="fas fa-trash-alt me-2"></i>Delete Job
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

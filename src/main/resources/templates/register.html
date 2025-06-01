@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/main :: html(title=~{::title}, content=~{::div.content}, styles=~{::style}, scripts=~{::script})}">
+<head>
+    <title>Register - Job Portal</title>
+    <style>
+        .register-form {
+            max-width: 450px;
+            margin: 2rem auto;
+        }
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        }
+        .card-header {
+            background: transparent;
+            border-bottom: none;
+            padding: 25px 25px 5px;
+        }
+        .card-body {
+            padding: 25px;
+        }
+        .btn-register {
+            padding: 12px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <div class="container">
+            <div class="register-form">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h3 class="mb-0">Create Account</h3>
+                        <p class="text-muted">Join our job portal community</p>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <span th:text="${error}">Error message</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+
+                        <form th:action="@{/register/new}" method="post" th:object="${user}" class="needs-validation" novalidate>
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                       placeholder="name@example.com" required>
+                                <label for="email">Email address</label>
+                                <div class="invalid-feedback">Please enter a valid email address.</div>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="password" th:field="*{password}" 
+                                       placeholder="Password" required minlength="6">
+                                <label for="password">Password</label>
+                                <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <select class="form-select" id="userTypeId" th:field="*{userTypeId}" required>
+                                    <option value="">Select Role</option>
+                                    <option th:each="type : ${getAllTypes}"
+                                            th:value="${type.userTypeId}"
+                                            th:text="${type.userTypeName}">Role Type</option>
+                                </select>
+                                <label for="userTypeId">Role</label>
+                                <div class="invalid-feedback">Please select a role.</div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-register">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <p class="text-muted mb-0">Already have an account?</p>
+                            <a th:href="@{/login}" class="text-decoration-none">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login here
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enable Bootstrap form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+</body>
+</html>

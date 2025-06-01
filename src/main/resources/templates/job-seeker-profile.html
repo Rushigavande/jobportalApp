@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org/" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Setup - Job Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        /* Page Layout */
+        .page-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Typography */
+        .page-title {
+            color: #2d3748;
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #4a5568;
+            font-weight: 500;
+            font-size: 1.25rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Form Styles */
+        .form-control {
+            border: 1px solid #e0e0e0;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        /* Skills Section */
+        .skill-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* File Upload */
+        .file-upload {
+            background: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: block;
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid #e2e8f0;
+            color: #4a5568;
+            padding: 0.8rem 2rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #f8fafc;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Logo Section */
+        .logo-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            color: white;
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-container {
+                margin: 1rem auto;
+            }
+
+            .profile-card {
+                padding: 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <div class="logo-section">
+            <h2 class="logo">Job4you</h2>
+        </div>
+
+        <div class="profile-card">
+            <form th:action="@{/job-seeker-profile/addNew}"
+                  th:object="${profile}"
+                  method="post"
+                  enctype="multipart/form-data">
+                
+                <h1 class="page-title">Candidate Profile</h1>
+                <p class="page-subtitle">Set up your professional profile</p>
+
+                <!-- Hidden Fields -->
+                <input id="user_account_id" th:field="*{userAccountId}" name="userAccountId" type="text" hidden/>
+
+                <!-- Personal Information -->
+                <div class="section-title">Personal Information</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input placeholder="First Name" id="firstName" th:field="*{firstName}" name="firstName" type="text" class="form-control"/>
+                    </div>
+                    <div class="col-md-6">
+                        <input placeholder="Last Name" id="lastName" name="lastName" th:field="*{lastName}" type="text" class="form-control"/>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="section-title">Location</div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <input placeholder="City" name="city" th:field="*{city}" type="text" class="form-control"/>
+                    </div>
+                    <div class="col-md-4">
+                        <input placeholder="State" name="state" type="text" th:field="*{state}" class="form-control"/>
+                    </div>
+                    <div class="col-md-4">
+                        <input placeholder="Country" name="country" th:field="*{country}" type="text" class="form-control"/>
+                    </div>
+                </div>
+
+                <!-- Work Classification -->
+                <div class="section-title">Work Classification</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <select required class="form-control" name="workAuthorization" th:field="*{workAuthorization}">
+                            <option value="" selected>Work Authorization</option>
+                            <option value="US Citizen">US Citizen</option>
+                            <option value="Canadian Citizen">Canadian Citizen</option>
+                            <option value="Green Card">Green Card</option>
+                            <option value="H1 Visa">H1 Visa</option>
+                            <option value="TN Permit">TN Permit</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <select required class="form-control" name="employmentType" th:field="*{employmentType}">
+                            <option value="" selected>Seeking Employment</option>
+                            <option value="Full-Time">Full-time</option>
+                            <option value="Part-Time">Part-time</option>
+                            <option value="Freelance">Freelance</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="section-title">Skills</div>
+                <div class="skills-container">
+                    <div class="skill-item" th:each="skills, iterStat : *{skills}">
+                        <div class="row">
+                            <input type="text" th:field="*{skills[__${iterStat.index}__].id}" hidden/>
+                            <div class="col-md-4">
+                                <input placeholder="Skill Name" type="text" class="form-control" th:field="*{skills[__${iterStat.index}__].name}"/>
+                            </div>
+                            <div class="col-md-4">
+                                <input placeholder="Years of Experience" type="text" class="form-control" th:field="*{skills[__${iterStat.index}__].yearsOfExperience}"/>
+                            </div>
+                            <div class="col-md-4">
+                                <select required class="form-control" th:field="*{skills[__${iterStat.index}__].experienceLevel}">
+                                    <option value="Experience Level" selected>Experience Level</option>
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advance">Advanced</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-start mt-3 mb-4" sec:authorize="hasAuthority('Job Seeker')">
+                    <button type="button" class="btn btn-outline-secondary" id="addSkill">
+                        <i class="fas fa-plus me-2"></i>Add Skill
+                    </button>
+                </div>
+
+                <!-- Documents -->
+                <div class="row">
+                    <div class="col-md-6" sec:authorize="hasAuthority('Job Seeker')">
+                        <div class="section-title">Profile Photo</div>
+                        <div class="file-upload">
+                            <label class="file-upload-label" for="profile-photo">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Click to upload profile photo</span>
+                                <small class="d-block text-muted">Supports: PNG, JPEG</small>
+                            </label>
+                            <input id="profile-photo" type="file" name="image" accept="image/png, image/jpeg"/>
+                            <input type="text" name="profilePhoto" th:field="*{profilePhoto}" hidden/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section-title">Resume</div>
+                        <div class="file-upload">
+                            <label class="file-upload-label" for="resume-upload">
+                                <i class="fas fa-file-pdf"></i>
+                                <span sec:authorize="hasAuthority('Job Seeker')">Click to upload resume</span>
+                                <span sec:authorize="hasAuthority('Recruiter')">View candidate's resume</span>
+                                <small class="d-block text-muted">Supports: PDF</small>
+                            </label>
+                            <input id="resume-upload" type="file" name="pdf" accept="application/pdf" required="true" sec:authorize="hasAuthority('Job Seeker')"/>
+                            <input type="text" name="resume" th:field="*{resume}" hidden/>
+                            <a sec:authorize="hasAuthority('Recruiter')" class="btn btn-outline-secondary mt-2" th:href="@{|/job-seeker-profile/downloadResume?fileName=${profile.resume}&&userID=${profile.userAccountId}|}">
+                                <i class="fas fa-download me-2"></i>Download Resume
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center mt-4" sec:authorize="hasAuthority('Job Seeker')">
+                    <button type="submit" id="submit2" name="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // File upload preview
+        document.querySelectorAll('.file-upload').forEach(upload => {
+            const input = upload.querySelector('input[type="file"]');
+            const label = upload.querySelector('.file-upload-label span');
+            
+            if (input) {
+                input.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        label.textContent = e.target.files[0].name;
+                    }
+                });
+            }
+        });
+
+        // Add skill button functionality
+        $(document).ready(function() {
+            $('#addSkill').click(function() {
+                const skillsContainer = $('.skills-container');
+                const skillCount = $('.skill-item').length;
+                
+                const newSkill = `
+                    <div class="skill-item">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input placeholder="Skill Name" type="text" class="form-control" name="skills[${skillCount}].name"/>
+                            </div>
+                            <div class="col-md-4">
+                                <input placeholder="Years of Experience" type="text" class="form-control" name="skills[${skillCount}].yearsOfExperience"/>
+                            </div>
+                            <div class="col-md-4">
+                                <select required class="form-control" name="skills[${skillCount}].experienceLevel">
+                                    <option value="Experience Level" selected>Experience Level</option>
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advance">Advanced</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                skillsContainer.append(newSkill);
+            });
+        });
+    </script>
+</body>
+</html>

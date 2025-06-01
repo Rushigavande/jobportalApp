@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:replace="${title}">Job Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 280px;
+        }
+        
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: white !important;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            min-height: calc(100vh - 72px);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: fixed;
+            top: 72px;
+            left: 0;
+            z-index: 1000;
+        }
+
+        #sidebar.collapsed {
+            margin-left: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-link {
+            padding: 1rem 1.5rem;
+            color: #333;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .sidebar-link:hover {
+            background-color: #f8f9fa;
+            color: #764ba2;
+        }
+
+        .sidebar-link.active {
+            background-color: #764ba2;
+            color: white;
+        }
+
+        .sidebar-link i {
+            width: 24px;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        #content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        #content.full-width {
+            margin-left: 0;
+        }
+
+        /* User Menu */
+        .user-menu img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            margin-right: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+            #content {
+                margin-left: 0;
+            }
+            #sidebar.active {
+                margin-left: 0;
+            }
+        }
+
+        /* Custom Button Styles */
+        .btn-custom {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #764ba2;
+            border-color: #764ba2;
+            color: white;
+        }
+    </style>
+    <th:block th:replace="${styles}" />
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <button class="btn btn-link text-light d-lg-none me-2" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-briefcase me-2"></i>Job Portal
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jobs"><i class="fas fa-search me-1"></i>Find Jobs</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('EMPLOYER')">
+                        <a class="nav-link" href="/jobs/post"><i class="fas fa-plus-circle me-1"></i>Post Job</a>
+                    </li>
+                </ul>
+
+                <!-- User Menu -->
+                <div class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" 
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://ui-avatars.com/api/?name=User&background=random" 
+                             th:alt="${#authentication.name}" class="me-2">
+                        <span th:text="${#authentication.name}">User</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/profile">
+                            <i class="fas fa-user"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="/settings">
+                            <i class="fas fa-cog"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form th:action="@{/logout}" method="post" class="dropdown-item">
+                                <button type="submit" class="btn btn-link p-0">
+                                    <i class="fas fa-sign-out-alt"></i>Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Login/Register Buttons -->
+                <div class="d-flex" sec:authorize="!isAuthenticated()">
+                    <a href="/login" class="btn btn-outline-light me-2">Login</a>
+                    <a href="/register" class="btn btn-custom">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div id="sidebar" sec:authorize="isAuthenticated()">
+        <div class="py-4">
+            <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/dashboard' ? 'active' : ''}"
+                 th:href="@{/dashboard}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </div>
+
+            <!-- Job Seeker Links -->
+            <div sec:authorize="hasRole('JOBSEEKER')">
+                <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/applications' ? 'active' : ''}"
+                     th:href="@{/applications}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>My Applications</span>
+                </div>
+                <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/saved-jobs' ? 'active' : ''}"
+                     th:href="@{/saved-jobs}">
+                    <i class="fas fa-bookmark"></i>
+                    <span>Saved Jobs</span>
+                </div>
+                <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/resume' ? 'active' : ''}"
+                     th:href="@{/resume}">
+                    <i class="fas fa-file-upload"></i>
+                    <span>My Resume</span>
+                </div>
+            </div>
+
+            <!-- Employer Links -->
+            <div sec:authorize="hasRole('EMPLOYER')">
+                <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/my-jobs' ? 'active' : ''}"
+                     th:href="@{/my-jobs}">
+                    <i class="fas fa-briefcase"></i>
+                    <span>My Jobs</span>
+                </div>
+                <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/candidates' ? 'active' : ''}"
+                     th:href="@{/candidates}">
+                    <i class="fas fa-users"></i>
+                    <span>Candidates</span>
+                </div>
+                <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/company-profile' ? 'active' : ''}"
+                     th:href="@{/company-profile}">
+                    <i class="fas fa-building"></i>
+                    <span>Company Profile</span>
+                </div>
+            </div>
+
+            <!-- Common Links -->
+            <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/messages' ? 'active' : ''}"
+                 th:href="@{/messages}">
+                <i class="fas fa-envelope"></i>
+                <span>Messages</span>
+            </div>
+            <div class="sidebar-link" th:classappend="${#httpServletRequest.requestURI == '/notifications' ? 'active' : ''}"
+                 th:href="@{/notifications}">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="content" th:classappend="${!#authorization.expression('isAuthenticated()')} ? 'full-width'">
+        <div th:replace="${content}">
+            <!-- Page content will be inserted here -->
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('content').classList.toggle('full-width');
+        });
+
+        // Close sidebar on mobile when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar?.contains(event.target) && 
+                !sidebarToggle?.contains(event.target)) {
+                sidebar?.classList.add('collapsed');
+                document.getElementById('content')?.classList.add('full-width');
+            }
+        });
+
+        // Active link highlighting
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            if (link.getAttribute('href') === window.location.pathname) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+    <th:block th:replace="${scripts}" />
+</body>
+</html> 

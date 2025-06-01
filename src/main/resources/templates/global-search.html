@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Job Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 76px;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+        }
+
+        .navbar-brand span {
+            color: var(--secondary-color);
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #333 !important;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        /* Search Header */
+        .search-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .search-box .form-control {
+            border: 1px solid #e0e0e0;
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+        }
+
+        .search-box .btn-search {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            font-weight: 500;
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+
+        .filters-section h5 {
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            margin-bottom: 2rem;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-group label {
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .form-check {
+            margin-bottom: 0.5rem;
+        }
+
+        .form-check-label {
+            color: #718096;
+            cursor: pointer;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* Job Cards */
+        .job-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            border: none;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .job-title {
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-name {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .job-location {
+            color: #718096;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .job-badge {
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .title-span {
+            font-size: 0.875rem;
+            color: var(--primary-color);
+            margin-left: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filters-section {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                Job4you<span>.com</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jobs">Browse Jobs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/companies">Companies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-primary me-2" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary" href="/register">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Header -->
+    <section class="search-header">
+        <div class="container">
+            <div class="search-box">
+                <form th:action="@{/global-search/}" method="get" id="searchForm">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="job" name="job" 
+                                       placeholder="Search for a job" th:value="${job}">
+                                <label for="job">What job are you looking for?</label>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" id="location" name="location" 
+                                       placeholder="Enter location" th:value="${location}">
+                                <label for="location">Where?</label>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-search h-100 w-100">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <!-- Filters Sidebar -->
+            <div class="col-lg-3">
+                <div class="filters-section">
+                    <h5>Filter Results</h5>
+                    <form id="filterForm" th:action="@{/global-search/}">
+                        <div class="filter-group">
+                            <label class="d-block mb-2">Employment Type</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="part-time" 
+                                       name="partTime" th:checked="${partTime}" th:value="Part-Time">
+                                <label class="form-check-label" for="part-time">Part-Time</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="full-time" 
+                                       name="fullTime" th:checked="${fullTime}" th:value="Full-Time">
+                                <label class="form-check-label" for="full-time">Full-Time</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="freelance" 
+                                       name="freelance" th:checked="${freelance}" th:value="Freelance">
+                                <label class="form-check-label" for="freelance">Freelance</label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="d-block mb-2">Work Location</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="remote-only" 
+                                       name="remoteOnly" th:checked="${remoteOnly}" th:value="Remote-Only">
+                                <label class="form-check-label" for="remote-only">Remote Only</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="office-only" 
+                                       name="officeOnly" th:checked="${officeOnly}" th:value="Office-Only">
+                                <label class="form-check-label" for="office-only">Office Only</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="partial-remote" 
+                                       name="partialRemote" th:checked="${partialRemote}" th:value="Partial-Remote">
+                                <label class="form-check-label" for="partial-remote">Hybrid</label>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="d-block mb-2">Date Posted</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="today" 
+                                       name="today" th:checked="${today}">
+                                <label class="form-check-label" for="today">Today</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="7days" 
+                                       name="days7" th:checked="${days7}">
+                                <label class="form-check-label" for="7days">Last 7 Days</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="30days" 
+                                       name="days30" th:checked="${days30}">
+                                <label class="form-check-label" for="30days">Last 30 Days</label>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="hidJob" name="job" th:value="${job}">
+                        <input type="hidden" id="hidLoc" name="location" th:value="${location}">
+                    </form>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="mb-0">Search Results</h4>
+                    <div class="text-muted">Showing all available jobs</div>
+                </div>
+
+                <!-- Job Cards -->
+                <div class="job-results">
+                    <th:block th:each="jobPost : ${jobPost}">
+                        <a th:href="@{/job-details-apply/{id}(id=${jobPost.jobPostId})}" class="text-decoration-none">
+                            <div class="job-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="job-title mb-1">
+                                            [[${jobPost.jobTitle}]]
+                                            <span class="title-span" sec:authorize="hasAuthority('Recruiter')"
+                                                  th:text="'('+ @{${jobPost.totalCandidates}}+' Candidates Applied)'">
+                                            </span>
+                                            <span class="title-span" sec:authorize="hasAuthority('Job Seeker')"
+                                                  th:if="${jobPost.isActive == true}">(Applied)</span>
+                                            <span class="title-span" sec:authorize="hasAuthority('Job Seeker')"
+                                                  th:if="${jobPost.isSaved == true}">(Saved)</span>
+                                        </h5>
+                                        <div class="company-name" th:text="${jobPost.jobCompanyId.name}">Company Name</div>
+                                        <div class="job-location">
+                                            <i class="fas fa-map-marker-alt me-1"></i>
+                                            <span th:text="${jobPost.jobLocationId.city + ', ' + jobPost.jobLocationId.state}">
+                                                Location
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <img th:if="${jobPost.jobCompanyId.logo != null}" 
+                                         th:src="${jobPost.jobCompanyId.logo}"
+                                         alt="Company Logo" 
+                                         class="company-logo"
+                                         style="width: 64px; height: 64px; object-fit: contain;">
+                                </div>
+                                <div class="job-meta">
+                                    <span class="job-badge" th:if="${jobPost.jobType != null}">
+                                        <i class="fas fa-briefcase me-1"></i>
+                                        [[${jobPost.jobType}]]
+                                    </span>
+                                    <span class="job-badge" th:if="${jobPost.remote != null}">
+                                        <i class="fas fa-home me-1"></i>
+                                        [[${jobPost.remote}]]
+                                    </span>
+                                    <span class="job-badge" th:if="${jobPost.salary != null}">
+                                        <i class="fas fa-money-bill-wave me-1"></i>
+                                        [[${jobPost.salary}]]
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle filter form submission
+        document.querySelectorAll('#filterForm input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                document.getElementById('filterForm').submit();
+            });
+        });
+
+        // Sync search inputs with hidden fields
+        document.getElementById('job').addEventListener('change', function() {
+            document.getElementById('hidJob').value = this.value;
+        });
+        document.getElementById('location').addEventListener('change', function() {
+            document.getElementById('hidLoc').value = this.value;
+        });
+    </script>
+</body>
+</html>
