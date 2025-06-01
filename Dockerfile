@@ -20,9 +20,10 @@ COPY --from=build /app/target/*.jar app.jar
 
 # Set environment variables
 ENV PORT=8080
+ENV SPRING_PROFILES_ACTIVE=prod
 
 # Expose the port
 EXPOSE 8080
 
-# Run the application
+# Run the application with support for environment variables
 CMD ["java", "-jar", "app.jar"] 
