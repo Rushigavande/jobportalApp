@@ -21,9 +21,15 @@ COPY --from=build /app/target/*.jar app.jar
 # Set environment variables
 ENV PORT=8080
 ENV SPRING_PROFILES_ACTIVE=prod
+ENV TZ=UTC
 
 # Expose the port
 EXPOSE 8080
 
-# Run the application with support for environment variables
-CMD ["java", "-jar", "app.jar"] 
+# Run the application with production profile
+CMD ["java", \
+     "-jar", \
+     "-Dspring.profiles.active=prod", \
+     "-Dserver.port=${PORT}", \
+     "-Duser.timezone=${TZ}", \
+     "app.jar"] 
