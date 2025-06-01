@@ -1,7 +1,10 @@
 package com.rushikeshgavande10.jobportal.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -15,9 +18,12 @@ public class Users {
     private int userId;
 
     @Column(unique = true)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Please provide a valid email address")
     private String email;
 
-    @NotEmpty
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
     private boolean isActive;
@@ -25,6 +31,7 @@ public class Users {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date registrationDate;
 
+    @NotNull(message = "Please select a role")
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "userTypeId", referencedColumnName = "userTypeId")
     private UsersType userTypeId;

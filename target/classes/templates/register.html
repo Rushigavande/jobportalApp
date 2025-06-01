@@ -29,6 +29,11 @@
             padding: 12px;
             width: 100%;
         }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -53,6 +58,7 @@
                                        placeholder="name@example.com" required>
                                 <label for="email">Email address</label>
                                 <div class="invalid-feedback">Please enter a valid email address.</div>
+                                <div class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                             </div>
 
                             <div class="form-floating mb-3">
@@ -60,6 +66,7 @@
                                        placeholder="Password" required minlength="6">
                                 <label for="password">Password</label>
                                 <div class="invalid-feedback">Password must be at least 6 characters long.</div>
+                                <div class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                             </div>
 
                             <div class="form-floating mb-4">
@@ -71,6 +78,7 @@
                                 </select>
                                 <label for="userTypeId">Role</label>
                                 <div class="invalid-feedback">Please select a role.</div>
+                                <div class="error-message" th:if="${#fields.hasErrors('userTypeId')}" th:errors="*{userTypeId}"></div>
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-register">
