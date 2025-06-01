@@ -1,5 +1,5 @@
 # Use Eclipse Temurin JDK 17 as the base image
-FROM eclipse-temurin:17-jdk-alpine as build
+FROM maven:3.9.6-eclipse-temurin-17 as build
 
 # Set working directory
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Build the application
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Runtime stage
 FROM eclipse-temurin:17-jre-alpine
